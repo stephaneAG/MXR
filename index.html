@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>MXR</title>
+  <!-- <link rel="stylesheet" href="style.css"> --> <!-- external css -->
+  <link rel="stylesheet" href="./css/font-awesome.css">
+  <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      /*font: 35px/50px "Lucida Grande", Arial, Verdana, sans-serif;*/
+      font-family: "Helvetica Neue", "Lucida Grande", Arial, Verdana, sans-serif;
+      font-weight: lighter;
+      /*text-shadow: white -1px 1px;*/
+    }
+
+    div#header { height: 60px; width: 100%; background: transparent; padding-top: 15px;  }
+    div#header div { position: relative; float: left; clear: none; /*border: 1px solid grey;*/ height: 100%; }
+    div#mxrlogo { margin-left: 15px; height: 57px; width: 138px; background-color: black; -webkit-mask: url('./imgs/mxrLogo.svg') no-repeat center center; -webkit-transition: background-color 5s ease-out; }
+    /*div#params { width: 200px; background: red; margin-right: 15px; float: right !important; height: 100%; }*/
+    div#params { /*width: 100px;*/ /*border: 1px solid grey;*/ right: 15px; float: right !important; z-index: 6; height: auto; }
+    div#params a { font-size: 20px; margin: 5px; color: grey; }
+    div#params a:hover { color: black; }
+    /*a#settings { text-align: center; height: 50px; border: 1px solid green; width: 150px; font-size: 20px; margin-top: 45%; position: relative; }*/
+
+    /* mix & tracks sections titles */
+    div.title { padding: 10px; margin: 5px; color: grey; font-size: 16px; }
+
+    /* tracks infos */
+    .track, .add-track { margin-left: 30px; border-left: 2px solid grey; padding-left: 10px; margin-bottom: 20px; }
+    .track .color, 
+     .track .name,
+     .track .type,
+     .track .duration,
+     .track .current-time { display: inline; }
+    .track .type { margin-right: 40px; }
+    .track .duration,
+     .track .current-time { font-size: 16px; }
+    .track_waveform { margin-top: 5px; margin-bottom: 5px; height: 40px; border: 1px dashed grey; width: calc(100% - 15px); }
+    
+    .fa-line-spacer:before { content: "|"; color: grey; margin-left: 5px; margin-right: 5px; }
+    
+    /*.track .color { background: #BADA55; }*/
+    
+    /* tracks controls */
+    .controls .control { color: grey; margin-right: 10px; }
+    .controls .control:hover { color: black; }
+    .controls .control.delete-track,
+     .controls .control.fast-forward, 
+     .controls .control.volume-up, 
+     .controls .control.section { margin-right: 40px; }
+    .controls .control.equalizer { margin-right: 60px; }
+
+    /* add a new track */
+    a#new-track { font-size: 20px; color: grey; cursor: pointer; -webkit-transition: color 1s; }
+    a#new-track:hover { color: black; }
+
+  </style>
+  <script src="./mxrLogic.js"></script> <!-- external js -->
+  <script>
+    /* change the MXR logo color */
+    function changeLogoColor(){
+      var randomColor = 'rgb(' +
+        (Math.floor(Math.random() * 256)) + ',' + 
+        (Math.floor(Math.random() * 256)) + ',' +
+        (Math.floor(Math.random() * 256)) + ')';
+      document.querySelector('#mxrlogo').style.backgroundColor = randomColor;
+    }
+  </script>
+</head>
+<body>
+<div id="wrapper"> <!-- overall wrapper -->  
+
+  <!-- header ( logo, version & settings btn ) -->
+  <div id="header">
+    <!-- MXR logo -->
+    <div id="mxrlogo"></div>
+    <div id="version"><pre>V0.1a</pre></div>
+    <div id="params">
+      <a href="#" id="infos"><i class="fa fa-info-circle"></i></a>
+      <a href="#" id="settings"><i class="fa fa-cog"></i></a>
+    </div>
+    
+  </div>
+
+  <!-- mixed track -->
+  <div id="main_track">
+    <div class="title">Mix</div>
+
+
+    <!-- the following hierarchy is the same for all the tracks -->
+    <div class="track">
+      <!-- <div class="color">track_color</div> -->
+      <div class="name">MXR track</div>
+      <i class="fa fa-line-spacer"></i>
+      <div class="type">master</div>
+      <div class="duration">00:00</div>
+      <i class="fa fa-line-spacer"></i>
+      <div class="current-time">00:00</div>
+      <div class="wave"><canvas class="track_waveform"></canvas></div>
+      <div class="controls">
+        <a class="control fast-backward" href="#"><i class="fa fa-fast-backward"></i></a>
+        <a class="control backward" href="#"><i class="fa fa-backward"></i></a>
+        <a class="control step-backward" href="#"><i class="fa fa-step-backward"></i></a>
+        <a class="control play" href="#"><i class="fa fa-play"></i></a>
+        <a class="control pause" href="#"><i class="fa fa-pause"></i></a>
+        <a class="control stop" href="#"><i class="fa fa-stop"></i></a>
+        <a class="control step-forward" href="#"><i class="fa fa-step-forward"></i></a>
+        <a class="control forward" href="#"><i class="fa fa-forward"></i></a>
+        <a class="control fast-forward" href="#"><i class="fa fa-fast-forward"></i></a>
+        <!-- volume controls -->
+        <a class="control volume-off" href="#"><i class="fa fa-volume-off"></i></a>
+        <a class="control volume-down" href="#"><i class="fa fa-volume-down"></i></a>
+        <a class="control volume-up" href="#"><i class="fa fa-volume-up"></i></a>
+        <!-- additional controls -->
+        <a class="control reverse" href="#"><i class="fa fa-undo"></i></a>
+        <a class="control loop" href="#"><i class="fa fa-refresh"></i></a>
+        <a class="control section" href="#"><i class="fa fa-columns"></i></a>
+        <!-- filters & equalizer -->
+        <a class="control filters" href="#"><i class="fa fa-tasks"></i></a>
+        <a class="control equalizer" href="#"><i class="fa fa-sliders"></i></a>
+        <!-- master track: save -->
+        <a class="control save" href="#"><i class="fa fa-download"></i></a>
+      </div>
+    </div>
+
+
+  </div>
+  <!-- track(s) -->
+  <div id="additional_tracks">
+    <div class="title">Tracks</div>
+
+    <!-- the following hierarchy is the same for all the tracks -->
+    <!-- volume controls -->
+    <!-- additional controls -->
+    <!-- filters & equalizer -->
+    <!-- filters & equalizer -->
+    <!-- track: load file or record from microphone -->
+    <!--
+    <div class="track">
+      <div class="name">track_name</div>
+      <i class="fa fa-line-spacer"></i>
+      <div class="type">track_type</div>
+      <div class="duration">00:00</div>
+      <i class="fa fa-line-spacer"></i>
+      <div class="current-time">00:00</div>
+      <div class="wave"><canvas class="track_waveform"></canvas></div>
+      <div class="controls">
+        <a class="control delete-track" href="#"><i class="fa fa-minus-square"></i></a>
+        <a class="control fast-backward" href="#"><i class="fa fa-fast-backward"></i></a>
+        <a class="control backward" href="#"><i class="fa fa-backward"></i></a>
+        <a class="control step-backward" href="#"><i class="fa fa-step-backward"></i></a>
+        <a class="control play" href="#"><i class="fa fa-play"></i></a>
+        <a class="control pause" href="#"><i class="fa fa-pause"></i></a>
+        <a class="control stop" href="#"><i class="fa fa-stop"></i></a>
+        <a class="control step-forward" href="#"><i class="fa fa-step-forward"></i></a>
+        <a class="control forward" href="#"><i class="fa fa-forward"></i></a>
+        <a class="control fast-forward" href="#"><i class="fa fa-fast-forward"></i></a>
+        
+        <a class="control volume-off" href="#"><i class="fa fa-volume-off"></i></a>
+        <a class="control volume-down" href="#"><i class="fa fa-volume-down"></i></a>
+        <a class="control volume-up" href="#"><i class="fa fa-volume-up"></i></a>
+        
+        <a class="control reverse" href="#"><i class="fa fa-undo"></i></a>
+        <a class="control loop" href="#"><i class="fa fa-refresh"></i></a>
+        <a class="control section" href="#"><i class="fa fa-columns"></i></a>
+        
+        <a class="control filters" href="#"><i class="fa fa-tasks"></i></a>
+        <a class="control equalizer" href="#"><i class="fa fa-sliders"></i></a>
+        
+        <a class="control open" href="#"><i class="fa fa-upload"></i></a>
+        <a class="control mike" href="#"><i class="fa fa-microphone"></i></a>
+      </div>
+    </div>
+    -->
+
+    <!-- add a new track -->
+    <div class="add-track"><a id="new-track">Add a new track <i class="fa fa-plus-square"></i></a></div>
+
+  </div>  
+
+</div> <!-- <div id="wrapper"> => overall wrapper -->
+
+  <script>
+    /* change the MXR logo color */
+    mxrLogoColorChangeInterval = setInterval( function(){
+      changeLogoColor();
+    }, 5000);
+
+    /* init MXR */
+    document.querySelector('#new-track').addEventListener('click', function(){
+      var newTrack = new mxr.Track();
+      mxr.addTrack( newTrack )
+    }, true);
+  </script>
+
+</body>
+</html>
